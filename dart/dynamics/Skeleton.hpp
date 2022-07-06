@@ -643,9 +643,9 @@ public:
   // Dynamics algorithms
   //----------------------------------------------------------------------------
 
-  void setSPDTarget(const Eigen::VectorXd& _target, double kp, double kd);
+  void setSPDTarget(const Eigen::VectorXd& _target, Eigen::VectorXd kp, Eigen::VectorXd kd);
 
-  Eigen::VectorXd getSPDForces(const Eigen::VectorXd& _target, double kp, double kd, void* solver);
+  Eigen::VectorXd getSPDForces(const Eigen::VectorXd& _target, Eigen::VectorXd kp, Eigen::VectorXd kd, void* solver);
 
   /// Compute forward dynamics
   void computeForwardDynamics();
