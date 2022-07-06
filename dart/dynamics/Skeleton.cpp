@@ -3726,18 +3726,25 @@ void Skeleton::computeForwardKinematics(
 }
 
 //==============================================================================
-void Skeleton::setSPDTarget(const Eigen::VectorXd& _target, double kp, double kd)
+void Skeleton::setSPDTarget(const Eigen::VectorXd& _target, Eigen::VectorXd kp, Eigen::VectorXd kd)
 {
   double dt = getTimeStep();
-  Eigen::VectorXd _forces = kp * getPositionDifferences(_target, getPositions()) - (kp * dt + kd) * getVelocities();
+  Eigen::VectorXd _forces = kp.cwiseProduct(getPositionDifferences(_target, getPositions())) - (kp * dt + kd).cwiseProduct(getVelocities());
   _forces.head(6).setZero();
   setForces(_forces);
-  for (auto & mBodyNode : mSkelCache.mBodyNodes)
-    mBodyNode->getParentJoint()->setSPDParam(kd * dt);
+  int idx = 0;
+  for (auto & mBodyNode : mSkelCache.mBodyNodes) {
+    double kdJoint = kd(idx);
+    mBodyNode->getParentJoint()->setSPDParam(kdJoint * dt);
+    if(idx == 0)
+      idx += 6;
+    else 
+      idx += 3;
+  }
 }
 
 //==============================================================================
-Eigen::VectorXd Skeleton::getSPDForces(const Eigen::VectorXd& _target, double kp, double kd, void* solver)
+Eigen::VectorXd Skeleton::getSPDForces(const Eigen::VectorXd& _target, Eigen::VectorXd kp, Eigen::VectorXd kd, void* solver)
 {
   Eigen::VectorXd _velocities_backup = getVelocities();
 
